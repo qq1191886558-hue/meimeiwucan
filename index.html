@@ -502,15 +502,19 @@
         }
 
         // 更新时间徽章
-        function updateTimeBadge() {
-            const hour = new Date().getHours();
-            let mode = '夜宵模式';
-            if (hour >= 6 && hour < 10.5) mode = '早餐模式';
-            else if (hour >= 10.5 && hour < 14) mode = '午餐模式';
-            else if (hour >= 14 && hour < 17) mode = '下午茶模式';
-            else if (hour >= 17 && hour < 21) mode = '晚餐模式';
-            timeBadge.textContent = mode;
-        }
+        function getCurrentTimePeriod() {
+    const now = new Date();
+    const hour = now.getHours();
+    const minute = now.getMinutes();
+    const timeInMinutes = hour * 60 + minute; // 转换成从0:00开始的分钟数
+    
+    if (timeInMinutes >= 6*60 && timeInMinutes < 10*60+30) return 'breakfast';   // 6:00-10:29
+    if (timeInMinutes >= 10*60+30 && timeInMinutes < 14*60) return 'lunch';      // 10:30-13:59
+    if (timeInMinutes >= 14*60 && timeInMinutes < 17*60) return 'afternoon';     // 14:00-16:59
+    if (timeInMinutes >= 17*60 && timeInMinutes < 21*60) return 'dinner';        // 17:00-20:59
+    return 'night';                                                               // 21:00-次日5:59
+}
+
 
         // 获取时间相关的温馨提示
         function getTimeBasedMessage() {
