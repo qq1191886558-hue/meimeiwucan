@@ -1,0 +1,677 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Love Management System · 外卖版</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            overflow-x: hidden;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 420px;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 24px;
+            padding: 32px 24px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(10px);
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 32px;
+        }
+
+        .title {
+            font-size: 24px;
+            font-weight: 600;
+            color: #2d3748;
+            margin-bottom: 8px;
+        }
+
+        .subtitle {
+            font-size: 14px;
+            color: #718096;
+        }
+
+        .time-badge {
+            display: inline-block;
+            padding: 6px 12px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-radius: 12px;
+            font-size: 12px;
+            margin-top: 8px;
+        }
+
+        .card-container {
+            position: relative;
+            height: 280px;
+            margin-bottom: 32px;
+            perspective: 1000px;
+        }
+
+        .card {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            box-shadow: 0 10px 30px rgba(102, 126, 234, 0.3);
+            transition: all 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+            transform-style: preserve-3d;
+        }
+
+        .card.shuffle {
+            animation: shuffle 0.6s ease-in-out;
+        }
+
+        @keyframes shuffle {
+            0%, 100% { transform: rotateY(0deg) scale(1); }
+            50% { transform: rotateY(180deg) scale(0.8); }
+        }
+
+        .card-icon {
+            font-size: 64px;
+            margin-bottom: 16px;
+            filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.2));
+        }
+
+        .card-title {
+            font-size: 28px;
+            font-weight: 600;
+            margin-bottom: 12px;
+        }
+
+        .card-description {
+            font-size: 15px;
+            opacity: 0.9;
+            text-align: center;
+            padding: 0 20px;
+            line-height: 1.6;
+        }
+
+        .main-button {
+            width: 100%;
+            padding: 16px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 16px;
+            font-size: 18px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+            margin-bottom: 16px;
+        }
+
+        .main-button:active {
+            transform: scale(0.98);
+            box-shadow: 0 2px 8px rgba(102, 126, 234, 0.4);
+        }
+
+        .main-button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        .action-buttons {
+            display: none;
+            gap: 12px;
+            margin-top: 16px;
+        }
+
+        .action-buttons.show {
+            display: flex;
+        }
+
+        .action-btn {
+            flex: 1;
+            padding: 14px;
+            border: none;
+            border-radius: 12px;
+            font-size: 15px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn-confirm {
+            background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);
+            color: white;
+            box-shadow: 0 4px 12px rgba(72, 187, 120, 0.3);
+        }
+
+        .btn-retry {
+            background: white;
+            color: #667eea;
+            border: 2px solid #667eea;
+        }
+
+        .btn-confirm:active {
+            transform: scale(0.98);
+        }
+
+        .btn-retry:active {
+            transform: scale(0.98);
+        }
+
+        .stats {
+            text-align: center;
+            margin-top: 24px;
+            padding-top: 24px;
+            border-top: 1px solid #e2e8f0;
+            font-size: 13px;
+            color: #718096;
+        }
+
+        .special-message {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) scale(0);
+            background: white;
+            padding: 32px 24px;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            text-align: center;
+            z-index: 1000;
+            max-width: 340px;
+            width: 90%;
+            transition: all 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+        }
+
+        .special-message.show {
+            transform: translate(-50%, -50%) scale(1);
+        }
+
+        .special-message-icon {
+            font-size: 56px;
+            margin-bottom: 16px;
+        }
+
+        .special-message-text {
+            font-size: 18px;
+            line-height: 1.6;
+            color: #2d3748;
+            margin-bottom: 20px;
+            white-space: pre-line;
+        }
+
+        .special-message-btn {
+            width: 100%;
+            padding: 14px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 500;
+            cursor: pointer;
+        }
+
+        .overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 999;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
+        }
+
+        .overlay.show {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .fade-in {
+            animation: fadeIn 0.5s ease;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="title">Leave It to Me</div>
+            <div class="subtitle">💗梅梅💗专属午餐决策系统</div>
+            <div class="time-badge" id="timeBadge">加载中...</div>
+        </div>
+
+        <div class="card-container">
+            <div class="card" id="resultCard">
+                <div class="card-icon">🎯</div>
+                <div class="card-title">准备好了吗</div>
+                <div class="card-description">不用纠结，让我帮你决定</div>
+            </div>
+        </div>
+
+        <button class="main-button" id="drawButton">开始抽取</button>
+
+        <div class="action-buttons" id="actionButtons">
+            <button class="action-btn btn-confirm" id="confirmBtn">就它了 ✅</button>
+            <button class="action-btn btn-retry" id="retryBtn">我再纠结一下</button>
+        </div>
+
+        <div class="stats" id="stats">
+            今日已为你决策 <span id="todayCount">0</span> 次
+        </div>
+    </div>
+
+    <div class="overlay" id="overlay"></div>
+    <div class="special-message" id="specialMessage">
+        <div class="special-message-icon" id="specialIcon">❤️</div>
+        <div class="special-message-text" id="specialText"></div>
+        <button class="special-message-btn" id="specialBtn">好的</button>
+    </div>
+
+    <script>
+        // ==================== 配置区 ====================
+        
+        // 【可修改】外卖选项池 - 按时段分类
+        // 时段标签说明：
+        // 'breakfast' - 早餐 (6:00-10:30)
+        // 'lunch' - 午餐 (10:30-14:00)
+        // 'afternoon' - 下午茶 (14:00-17:00)
+        // 'dinner' - 晚餐 (17:00-21:00)
+        // 'night' - 夜宵 (21:00-次日6:00)
+        // 'anytime' - 全时段
+        
+        const foodOptions = [
+            // 🌅 早餐专属
+            { name: '豆浆油条', icon: '🥖', reason: '传统的早晨，元气满满', category: 'safe', time: ['breakfast'] },
+            { name: '肠粉', icon: '🍚', reason: '滑嫩清淡，温柔的开始', category: 'comfort', time: ['breakfast', 'lunch'] },
+            { name: '包子粥', icon: '🥟', reason: '热乎乎的，胃会很舒服', category: 'comfort', time: ['breakfast'] },
+            { name: '煎饼果子', icon: '🌮', reason: '脆脆的，早上需要这个', category: 'safe', time: ['breakfast'] },
+            { name: '三明治', icon: '🥪', reason: '简单不复杂，刚刚好', category: 'safe', time: ['breakfast', 'afternoon', 'anytime'] },
+            { name: '鸡蛋灌饼', icon: '🥞', reason: '饼香蛋嫩，满足感拉满', category: 'safe', time: ['breakfast'] },
+            { name: '热牛奶 + 面包', icon: '🥛', reason: '温暖又简单', category: 'light', time: ['breakfast', 'night'] },
+            
+            // 🍚 正餐类（午餐 + 晚餐）
+            { name: '盖浇饭', icon: '🍚', reason: '稳妥又不出错，经典永不过时', category: 'safe', time: ['lunch', 'dinner'] },
+            { name: '黄焖鸡米饭', icon: '🍗', reason: '认真吃一顿，对身体好', category: 'safe', time: ['lunch', 'dinner'] },
+            { name: '煲仔饭', icon: '🍲', reason: '锅巴香脆，温暖踏实', category: 'safe', time: ['lunch', 'dinner'] },
+            { name: '中式小炒', icon: '🥘', reason: '家的味道，吃着安心', category: 'safe', time: ['lunch', 'dinner'] },
+            { name: '川湘辣味套餐', icon: '🌶️', reason: '想吃点有满足感的，今天犒劳自己', category: 'safe', time: ['lunch', 'dinner'] },
+            { name: '家常菜套餐', icon: '🍱', reason: '不油腻不复杂，刚刚好', category: 'safe', time: ['lunch', 'dinner'] },
+            { name: '鸡排饭', icon: '🍗', reason: '快餐里的优等生，稳定发挥', category: 'safe', time: ['lunch', 'dinner'] },
+            { name: '卤肉饭', icon: '🥩', reason: '有肉有饭，扎实又满足', category: 'safe', time: ['lunch', 'dinner', 'night'] },
+            { name: '咖喱饭', icon: '🍛', reason: '温柔的辣，暖胃又暖心', category: 'safe', time: ['lunch', 'dinner'] },
+            { name: '日式便当', icon: '🍱', reason: '精致不将就，你值得', category: 'safe', time: ['lunch', 'dinner'] },
+            { name: '韩式拌饭', icon: '🥗', reason: '营养均衡，照顾好自己', category: 'safe', time: ['lunch', 'dinner'] },
+            { name: '泰式盖饭', icon: '🍚', reason: '酸甜清爽，换个口味也不错', category: 'safe', time: ['lunch', 'dinner'] },
+            { name: '宫保鸡丁盖饭', icon: '🍛', reason: '微辣开胃，经典好味道', category: 'safe', time: ['lunch', 'dinner'] },
+            { name: '红烧肉套餐', icon: '🥩', reason: '想吃肉的时候，就要认真吃', category: 'safe', time: ['lunch', 'dinner'] },
+
+            // 🍜 粉面汤类（全天适用，但夜宵和早餐更合适）
+            { name: '拉面', icon: '🍜', reason: '热的会让人舒服一点', category: 'comfort', time: ['lunch', 'dinner', 'night'] },
+            { name: '牛肉面', icon: '🍜', reason: '汤鲜肉足，吃完有力气', category: 'comfort', time: ['lunch', 'dinner'] },
+            { name: '米线', icon: '🥢', reason: '适合慢慢吃、慢慢缓下来', category: 'comfort', time: ['lunch', 'dinner', 'night'] },
+            { name: '米粉', icon: '🍲', reason: '清淡养胃，温柔对待自己', category: 'comfort', time: ['breakfast', 'lunch', 'dinner', 'night'] },
+            { name: '酸辣粉', icon: '🌶️', reason: '酸辣开胃，心情跟着好起来', category: 'comfort', time: ['lunch', 'dinner', 'night'] },
+            { name: '馄饨', icon: '🥟', reason: '一口一个小确幸', category: 'comfort', time: ['breakfast', 'lunch', 'dinner', 'night'] },
+            { name: '水饺', icon: '🥟', reason: '实在又温暖，像被抱住', category: 'comfort', time: ['lunch', 'dinner', 'night'] },
+            { name: '砂锅粥', icon: '🍲', reason: '慢熬的温柔，胃会感谢你', category: 'comfort', time: ['breakfast', 'dinner', 'night'] },
+            { name: '皮蛋瘦肉粥', icon: '🥣', reason: '喝完整个人都暖了', category: 'comfort', time: ['breakfast', 'dinner', 'night'] },
+            { name: '螺蛳粉', icon: '🍜', reason: '想吃点刺激的，让味蕾醒一醒', category: 'comfort', time: ['lunch', 'dinner', 'night'] },
+            { name: '云吞面', icon: '🍜', reason: '面滑汤鲜，港式的温柔', category: 'comfort', time: ['lunch', 'dinner', 'night'] },
+            { name: '热干面', icon: '🍜', reason: '浓郁扎实，武汉人的灵魂', category: 'comfort', time: ['breakfast', 'lunch'] },
+            { name: '担担面', icon: '🍜', reason: '麻辣鲜香，一碗就够', category: 'comfort', time: ['lunch', 'dinner'] },
+
+            // 🍗 快乐碳水类（午餐、下午茶、晚餐、夜宵）
+            { name: '汉堡', icon: '🍔', reason: '今天可以不用太自律', category: 'happy', time: ['lunch', 'afternoon', 'dinner', 'night'] },
+            { name: '炸鸡', icon: '🍗', reason: '快乐一下也没关系', category: 'happy', time: ['lunch', 'afternoon', 'dinner', 'night'] },
+            { name: '薯条', icon: '🍟', reason: '盐和油脂是快乐密码', category: 'happy', time: ['afternoon', 'night'] },
+            { name: '披萨', icon: '🍕', reason: '芝士就是力量', category: 'happy', time: ['lunch', 'dinner', 'night'] },
+            { name: '炸串', icon: '🍢', reason: '有时候就想吃点"不健康"的', category: 'happy', time: ['afternoon', 'dinner', 'night'] },
+            { name: '章鱼小丸子', icon: '🐙', reason: '一口一个小确幸，治愈系快乐', category: 'happy', time: ['afternoon', 'night'] },
+            { name: '鸡米花', icon: '🍗', reason: '小小的快乐，一颗接一颗', category: 'happy', time: ['afternoon', 'night'] },
+
+            // 🥗 轻食健康类（午餐、晚餐）
+            { name: '沙拉', icon: '🥗', reason: '吃完不会有负担', category: 'light', time: ['lunch', 'dinner'] },
+            { name: '全麦三明治', icon: '🥪', reason: '你已经很努力了', category: 'light', time: ['breakfast', 'lunch', 'afternoon'] },
+            { name: '低脂轻食', icon: '🥙', reason: '对自己好一点，从每一餐开始', category: 'light', time: ['lunch', 'dinner'] },
+            { name: '鸡胸肉套餐', icon: '🍗', reason: '健康也可以很好吃', category: 'light', time: ['lunch', 'dinner'] },
+            { name: '素食便当', icon: '🥗', reason: '清清爽爽，没有压力', category: 'light', time: ['lunch', 'dinner'] },
+            { name: '蔬菜卷', icon: '🌯', reason: '轻盈又满足', category: 'light', time: ['lunch', 'dinner'] },
+
+            // 🧋 饮品甜品类（下午茶为主）
+            { name: '奶茶', icon: '🧋', reason: '不一定饿，只是想被安慰', category: 'sweet', time: ['afternoon', 'night', 'anytime'] },
+            { name: '咖啡', icon: '☕', reason: '需要一点提神，也需要一点甜', category: 'sweet', time: ['breakfast', 'afternoon', 'anytime'] },
+            { name: '果茶', icon: '🍹', reason: '酸酸甜甜，心情跟着轻快', category: 'sweet', time: ['afternoon', 'anytime'] },
+            { name: '酸奶', icon: '🥛', reason: '温柔的甜，不会腻', category: 'sweet', time: ['breakfast', 'afternoon', 'anytime'] },
+            { name: '甜品', icon: '🍰', reason: '糖分是情绪的止痛药', category: 'sweet', time: ['afternoon'] },
+            { name: '蛋糕', icon: '🎂', reason: '给自己一个甜蜜的理由', category: 'sweet', time: ['afternoon'] },
+            { name: '冰淇淋', icon: '🍦', reason: '凉凉的甜，烦恼会化掉一点', category: 'sweet', time: ['afternoon', 'night'] },
+            { name: '泡芙', icon: '🧁', reason: '一口酥脆一口甜', category: 'sweet', time: ['afternoon'] },
+            { name: '马卡龙', icon: '🍬', reason: '精致的小确幸', category: 'sweet', time: ['afternoon'] },
+
+            // 🍉 补充能量类（全时段可选）
+            { name: '水果拼盘', icon: '🍉', reason: '不想吃饭也没关系', category: 'light', time: ['anytime'] },
+            { name: '坚果', icon: '🥜', reason: '先照顾好自己', category: 'light', time: ['anytime'] },
+            { name: '面包', icon: '🥖', reason: '简单一点，也挺好', category: 'light', time: ['breakfast', 'afternoon', 'night'] },
+            { name: '小零食拼盘', icon: '🍪', reason: '随便吃点，别饿着就行', category: 'light', time: ['afternoon', 'night'] },
+
+            // 🌙 夜宵专属
+            { name: '烧烤', icon: '串', reason: '夜晚的仪式感', category: 'happy', time: ['night'] },
+            { name: '麻辣烫', icon: '🍲', reason: '深夜食堂，想吃就吃', category: 'comfort', time: ['night', 'dinner'] },
+            { name: '炒粉', icon: '🍜', reason: '夜宵就该这么吃', category: 'comfort', time: ['night'] },
+            { name: '小龙虾', icon: '🦞', reason: '今晚放纵一下', category: 'happy', time: ['night', 'dinner'] },
+            { name: '关东煮', icon: '🍢', reason: '暖暖的，陪你到深夜', category: 'comfort', time: ['night'] },
+            { name: '煎饺', icon: '🥟', reason: '脆脆的底，满满的馅', category: 'comfort', time: ['night', 'breakfast'] }
+        ];
+
+        // 【可修改】彩蛋概率设置
+        const EASTER_EGG_PROBABILITY = 0.08; // 8% 常规彩蛋
+        const RARE_EASTER_EGG_PROBABILITY = 0.01; // 1% 稀有彩蛋（系统真相）
+        const UPGRADE_PROBABILITY = 0.15; // 15% 升级提示
+        
+        // 【可修改】兜底触发阈值（连续纠结次数）
+        const HESITATION_THRESHOLD = 2; // 连续2次纠结触发"我请"
+        const PROTECTION_THRESHOLD = 3; // 连续3次触发保护
+        
+        // 【可修改】彩蛋池 - 完整版
+        const easterEggs = [
+            // A类：低成本彩蛋
+            { 
+                icon: '💝', 
+                text: '今日点单权已被我接管\n你负责等外卖\n我负责想你吃什么', 
+                button: '好吧，交给你',
+                type: 'normal'
+            },
+            { 
+                icon: '🎁', 
+                text: '你已经纠结够久了\n现在开始，我替你决定', 
+                button: '听你的',
+                type: 'normal'
+            },
+            
+            // B类：中级彩蛋
+            { 
+                icon: '💝', 
+                text: '别点外卖了\n今天我带你出去吃', 
+                button: '开启约会模式',
+                type: 'normal'
+            },
+            
+            // C类：高情绪价值彩蛋
+            { 
+                icon: '❤️', 
+                text: '本系统存在的唯一目的：\n不让你一个人纠结', 
+                button: '我知道了',
+                type: 'rare'
+            },
+            { 
+                icon: '👨‍🍳', 
+                text: '今天不吃外卖\n吃我做的 / 吃我陪的', 
+                button: '好呀',
+                type: 'normal'
+            },
+            { 
+                icon: '🌙', 
+                text: '不想吃也没关系\n要不要我陪你一会儿', 
+                button: '好呀',
+                type: 'normal'
+            }
+        ];
+
+        // ==================== 核心逻辑 ====================
+        
+        let drawCount = 0;
+        let hesitationCount = 0;
+        let lastResults = [];
+        let totalCount = parseInt(localStorage.getItem('lms_total_count') || '0');
+        let lastDrawDate = localStorage.getItem('lms_last_date') || '';
+        let todayDrawCount = 0;
+
+        const drawButton = document.getElementById('drawButton');
+        const resultCard = document.getElementById('resultCard');
+        const actionButtons = document.getElementById('actionButtons');
+        const confirmBtn = document.getElementById('confirmBtn');
+        const retryBtn = document.getElementById('retryBtn');
+        const timeBadge = document.getElementById('timeBadge');
+        const todayCount = document.getElementById('todayCount');
+        const specialMessage = document.getElementById('specialMessage');
+        const overlay = document.getElementById('overlay');
+        const specialIcon = document.getElementById('specialIcon');
+        const specialText = document.getElementById('specialText');
+        const specialBtn = document.getElementById('specialBtn');
+
+        // 获取当前时段
+        function getCurrentTimePeriod() {
+            const hour = new Date().getHours();
+            if (hour >= 6 && hour < 10.5) return 'breakfast';
+            if (hour >= 10.5 && hour < 14) return 'lunch';
+            if (hour >= 14 && hour < 17) return 'afternoon';
+            if (hour >= 17 && hour < 21) return 'dinner';
+            return 'night';
+        }
+
+        // 根据时段过滤食物选项
+        function getAvailableFoods() {
+            const currentPeriod = getCurrentTimePeriod();
+            return foodOptions.filter(food => 
+                food.time.includes(currentPeriod) || food.time.includes('anytime')
+            );
+        }
+
+        // 初始化
+        function init() {
+            updateTimeBadge();
+            checkDate();
+            todayCount.textContent = totalCount;
+        }
+
+        // 检查日期，重置当日计数
+        function checkDate() {
+            const today = new Date().toDateString();
+            if (lastDrawDate !== today) {
+                todayDrawCount = 0;
+                localStorage.setItem('lms_last_date', today);
+            }
+        }
+
+        // 更新时间徽章
+        function updateTimeBadge() {
+            const hour = new Date().getHours();
+            let mode = '夜宵模式';
+            if (hour >= 6 && hour < 10.5) mode = '早餐模式';
+            else if (hour >= 10.5 && hour < 14) mode = '午餐模式';
+            else if (hour >= 14 && hour < 17) mode = '下午茶模式';
+            else if (hour >= 17 && hour < 21) mode = '晚餐模式';
+            timeBadge.textContent = mode;
+        }
+
+        // 获取时间相关的温馨提示
+        function getTimeBasedMessage() {
+            const hour = new Date().getHours();
+            if (hour >= 6 && hour < 9 && todayDrawCount === 1) {
+                return { icon: '🌅', text: '早上要好好吃\n一天才会有精神', button: '知道啦' };
+            }
+            if (hour >= 18 && hour < 21) {
+                return { icon: '⏰', text: '晚上不要随便应付\n吃点热的，我放心一点', button: '好的' };
+            }
+            if (hour >= 21 || hour < 6) {
+                return { icon: '🌙', text: '这么晚了\n吃点清淡的，对胃好', button: '听你的' };
+            }
+            return null;
+        }
+
+        // 检查是否周五（约会模式）
+        function isFriday() {
+            return new Date().getDay() === 5;
+        }
+
+        // 抽取逻辑
+        function draw() {
+            drawCount++;
+            todayDrawCount++;
+            totalCount++;
+            localStorage.setItem('lms_total_count', totalCount);
+            todayCount.textContent = totalCount;
+
+            // 🏆 彩蛋 10：忠实用户成就
+            if (totalCount === 10) {
+                showSpecialMessage('🏆', '感情管理系统运行稳定\n用户满意度：100%', '继续使用');
+                return;
+            }
+
+            // 🏆 彩蛋 11：过度纠结保护
+            if (hesitationCount >= PROTECTION_THRESHOLD) {
+                showSpecialMessage('🛡️', '已检测到你在为难自己\n建议停止纠结\n改为：被照顾', '我听话');
+                hesitationCount = 0;
+                return;
+            }
+
+            // 💥 彩蛋 5：我请（连续2次重选触发）
+            if (hesitationCount >= HESITATION_THRESHOLD) {
+                showSpecialMessage('💰', '这顿我请\n你不用算性价比\n点你真正想吃的', '那我不客气了');
+                hesitationCount = 0;
+                return;
+            }
+
+            // 💥 彩蛋 6：照顾型提示（时段相关）
+            const timeMessage = getTimeBasedMessage();
+            if (timeMessage && Math.random() < 0.3) {
+                showSpecialMessage(timeMessage.icon, timeMessage.text, timeMessage.button);
+                return;
+            }
+
+            // 💥 彩蛋 4：约会模式（周五必出或8%概率）
+            if (isFriday() && todayDrawCount === 1) {
+                showSpecialMessage('💝', '别点外卖了\n今天我带你出去吃', '开启约会模式');
+                return;
+            }
+
+            // ❤️ 彩蛋 7：系统真相（1%稀有）
+            if (Math.random() < RARE_EASTER_EGG_PROBABILITY) {
+                const rareEggs = easterEggs.filter(e => e.type === 'rare');
+                const egg = rareEggs[Math.floor(Math.random() * rareEggs.length)];
+                showSpecialMessage(egg.icon, egg.text, egg.button);
+                return;
+            }
+
+            // 常规彩蛋触发（8%）
+            if (Math.random() < EASTER_EGG_PROBABILITY) {
+                const normalEggs = easterEggs.filter(e => e.type === 'normal');
+                const egg = normalEggs[Math.floor(Math.random() * normalEggs.length)];
+                showSpecialMessage(egg.icon, egg.text, egg.button);
+                return;
+            }
+
+            // 正常抽取 - 根据时段过滤
+            const availableFoods = getAvailableFoods();
+            if (availableFoods.length === 0) {
+                showSpecialMessage('😅', '当前时段暂无合适的选项\n要不要换个时间再试试', '好的');
+                return;
+            }
+            
+            const result = availableFoods[Math.floor(Math.random() * availableFoods.length)];
+            lastResults.push(result);
+            if (lastResults.length > 2) lastResults.shift();
+
+            // 🎁 彩蛋 2：升级提示（抽到快餐类15%概率）
+            if (result.category === 'safe' && Math.random() < UPGRADE_PROBABILITY) {
+                showSpecialMessage('⭐', '本来点快餐\n但你值得吃好一点\n\n建议：升级你最爱的那家', '就这么办');
+                return;
+            }
+
+            showResult(result);
+        }
+
+        // 显示结果
+        function showResult(result) {
+            drawButton.disabled = true;
+            resultCard.classList.add('shuffle');
+
+            setTimeout(() => {
+                resultCard.classList.remove('shuffle');
+                resultCard.querySelector('.card-icon').textContent = result.icon;
+                resultCard.querySelector('.card-title').textContent = result.name;
+                resultCard.querySelector('.card-description').textContent = result.reason;
+                
+                actionButtons.classList.add('show');
+                drawButton.disabled = false;
+            }, 600);
+        }
+
+        // 显示特殊消息
+        function showSpecialMessage(icon, text, buttonText) {
+            specialIcon.textContent = icon;
+            specialText.textContent = text;
+            specialBtn.textContent = buttonText;
+            
+            overlay.classList.add('show');
+            specialMessage.classList.add('show');
+        }
+
+        // 关闭特殊消息
+        function closeSpecialMessage() {
+            overlay.classList.remove('show');
+            specialMessage.classList.remove('show');
+        }
+
+        // 确认选择
+        function confirm() {
+            hesitationCount = 0;
+            showSpecialMessage('✅', '已批准\n去下单吧\n记得好好吃饭', '遵命');
+            actionButtons.classList.remove('show');
+        }
+
+        // 重新纠结
+        function retry() {
+            hesitationCount++;
+            actionButtons.classList.remove('show');
+            
+            // 🎁 彩蛋 3：检查连续轻食纠结（兜底逻辑）
+            if (lastResults.length >= 2) {
+                const lastTwo = lastResults.slice(-2);
+                const bothLight = lastTwo.every(r => r.category === 'light');
+                if (bothLight) {
+                    hesitationCount = HESITATION_THRESHOLD; // 直接触发"我请"
+                }
+            }
+        }
+
+        // 事件监听
+        drawButton.addEventListener('click', draw);
+        confirmBtn.addEventListener('click', confirm);
+        retryBtn.addEventListener('click', retry);
+        specialBtn.addEventListener('click', closeSpecialMessage);
+        overlay.addEventListener('click', closeSpecialMessage);
+
+        // 初始化
+        init();
+    </script>
+</body>
+</html>
