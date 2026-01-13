@@ -298,94 +298,97 @@
     <script>
         // ==================== 配置区 ====================
         
-        // 【方案B：宽松模式】正餐时段可低概率出现饮品
-        // 权重系统说明：
-        // - 正餐时段：正餐类权重 80%，粉面类 15%，饮品类 5%
-        // - 下午茶时段：饮品甜品权重 70%，轻食 30%
-        // - 夜宵时段：粉面小吃权重 60%，饮品 40%
+        // 【可修改】外卖选项池 - 按时段分类
+        // 时段标签说明：
+        // 'breakfast' - 早餐 (6:00-10:59)
+        // 'lunch' - 午餐 (11:00-13:59)
+        // 'afternoon' - 下午茶 (14:00-16:59)
+        // 'dinner' - 晚餐 (17:00-20:59)
+        // 'night' - 夜宵 (21:00-次日5:59)
+        // 'anytime' - 全时段
         
         const foodOptions = [
             // 🌅 早餐专属
-            { name: '豆浆油条', icon: '🥖', reason: '传统的早晨，元气满满', category: 'safe', time: ['breakfast'], weight: 1 },
-            { name: '肠粉', icon: '🍚', reason: '滑嫩清淡，温柔的开始', category: 'comfort', time: ['breakfast', 'lunch'], weight: 1 },
-            { name: '包子粥', icon: '🥟', reason: '热乎乎的，胃会很舒服', category: 'comfort', time: ['breakfast'], weight: 1 },
-            { name: '煎饼果子', icon: '🌮', reason: '脆脆的，早上需要这个', category: 'safe', time: ['breakfast'], weight: 1 },
-            { name: '三明治', icon: '🥪', reason: '简单不复杂，刚刚好', category: 'safe', time: ['breakfast', 'afternoon'], weight: 1 },
-            { name: '鸡蛋灌饼', icon: '🥞', reason: '饼香蛋嫩，满足感拉满', category: 'safe', time: ['breakfast'], weight: 1 },
-            { name: '热牛奶 + 面包', icon: '🥛', reason: '温暖又简单', category: 'light', time: ['breakfast', 'night'], weight: 1 },
+            { name: '豆浆油条', icon: '🥖', reason: '传统的早晨，元气满满', category: 'safe', time: ['breakfast'] },
+            { name: '肠粉', icon: '🍚', reason: '滑嫩清淡，温柔的开始', category: 'comfort', time: ['breakfast', 'lunch'] },
+            { name: '包子粥', icon: '🥟', reason: '热乎乎的，胃会很舒服', category: 'comfort', time: ['breakfast'] },
+            { name: '煎饼果子', icon: '🌮', reason: '脆脆的，早上需要这个', category: 'safe', time: ['breakfast'] },
+            { name: '三明治', icon: '🥪', reason: '简单不复杂，刚刚好', category: 'safe', time: ['breakfast', 'afternoon', 'anytime'] },
+            { name: '鸡蛋灌饼', icon: '🥞', reason: '饼香蛋嫩，满足感拉满', category: 'safe', time: ['breakfast'] },
+            { name: '热牛奶 + 面包', icon: '🥛', reason: '温暖又简单', category: 'light', time: ['breakfast', 'night'] },
             
-            // 🍚 正餐类（午餐 + 晚餐）- 高权重
-            { name: '盖浇饭', icon: '🍚', reason: '稳妥又不出错，经典永不过时', category: 'safe', time: ['lunch', 'dinner'], weight: 3 },
-            { name: '黄焖鸡米饭', icon: '🍗', reason: '认真吃一顿，对身体好', category: 'safe', time: ['lunch', 'dinner'], weight: 3 },
-            { name: '煲仔饭', icon: '🍲', reason: '锅巴香脆，温暖踏实', category: 'safe', time: ['lunch', 'dinner'], weight: 3 },
-            { name: '中式小炒', icon: '🥘', reason: '家的味道，吃着安心', category: 'safe', time: ['lunch', 'dinner'], weight: 3 },
-            { name: '川湘辣味套餐', icon: '🌶️', reason: '想吃点有满足感的，今天犒劳自己', category: 'safe', time: ['lunch', 'dinner'], weight: 3 },
-            { name: '家常菜套餐', icon: '🍱', reason: '不油腻不复杂，刚刚好', category: 'safe', time: ['lunch', 'dinner'], weight: 3 },
-            { name: '鸡排饭', icon: '🍗', reason: '快餐里的优等生，稳定发挥', category: 'safe', time: ['lunch', 'dinner'], weight: 3 },
-            { name: '卤肉饭', icon: '🥩', reason: '有肉有饭，扎实又满足', category: 'safe', time: ['lunch', 'dinner', 'night'], weight: 3 },
-            { name: '咖喱饭', icon: '🍛', reason: '温柔的辣，暖胃又暖心', category: 'safe', time: ['lunch', 'dinner'], weight: 3 },
-            { name: '日式便当', icon: '🍱', reason: '精致不将就，你值得', category: 'safe', time: ['lunch', 'dinner'], weight: 3 },
-            { name: '韩式拌饭', icon: '🥗', reason: '营养均衡，照顾好自己', category: 'safe', time: ['lunch', 'dinner'], weight: 3 },
-            { name: '泰式盖饭', icon: '🍚', reason: '酸甜清爽，换个口味也不错', category: 'safe', time: ['lunch', 'dinner'], weight: 3 },
-            { name: '宫保鸡丁盖饭', icon: '🍛', reason: '微辣开胃，经典好味道', category: 'safe', time: ['lunch', 'dinner'], weight: 3 },
-            { name: '红烧肉套餐', icon: '🥩', reason: '想吃肉的时候，就要认真吃', category: 'safe', time: ['lunch', 'dinner'], weight: 3 },
+            // 🍚 正餐类（午餐 + 晚餐）
+            { name: '盖浇饭', icon: '🍚', reason: '稳妥又不出错，经典永不过时', category: 'safe', time: ['lunch', 'dinner'] },
+            { name: '黄焖鸡米饭', icon: '🍗', reason: '认真吃一顿，对身体好', category: 'safe', time: ['lunch', 'dinner'] },
+            { name: '煲仔饭', icon: '🍲', reason: '锅巴香脆，温暖踏实', category: 'safe', time: ['lunch', 'dinner'] },
+            { name: '中式小炒', icon: '🥘', reason: '家的味道，吃着安心', category: 'safe', time: ['lunch', 'dinner'] },
+            { name: '川湘辣味套餐', icon: '🌶️', reason: '想吃点有满足感的，今天犒劳自己', category: 'safe', time: ['lunch', 'dinner'] },
+            { name: '家常菜套餐', icon: '🍱', reason: '不油腻不复杂，刚刚好', category: 'safe', time: ['lunch', 'dinner'] },
+            { name: '鸡排饭', icon: '🍗', reason: '快餐里的优等生，稳定发挥', category: 'safe', time: ['lunch', 'dinner'] },
+            { name: '卤肉饭', icon: '🥩', reason: '有肉有饭，扎实又满足', category: 'safe', time: ['lunch', 'dinner', 'night'] },
+            { name: '咖喱饭', icon: '🍛', reason: '温柔的辣，暖胃又暖心', category: 'safe', time: ['lunch', 'dinner'] },
+            { name: '日式便当', icon: '🍱', reason: '精致不将就，你值得', category: 'safe', time: ['lunch', 'dinner'] },
+            { name: '韩式拌饭', icon: '🥗', reason: '营养均衡，照顾好自己', category: 'safe', time: ['lunch', 'dinner'] },
+            { name: '泰式盖饭', icon: '🍚', reason: '酸甜清爽，换个口味也不错', category: 'safe', time: ['lunch', 'dinner'] },
+            { name: '宫保鸡丁盖饭', icon: '🍛', reason: '微辣开胃，经典好味道', category: 'safe', time: ['lunch', 'dinner'] },
+            { name: '红烧肉套餐', icon: '🥩', reason: '想吃肉的时候，就要认真吃', category: 'safe', time: ['lunch', 'dinner'] },
 
-            // 🍜 粉面汤类（可当正餐）- 中权重
-            { name: '拉面', icon: '🍜', reason: '热的会让人舒服一点', category: 'comfort', time: ['lunch', 'dinner', 'night'], weight: 2 },
-            { name: '牛肉面', icon: '🍜', reason: '汤鲜肉足，吃完有力气', category: 'comfort', time: ['lunch', 'dinner'], weight: 2 },
-            { name: '米线', icon: '🥢', reason: '适合慢慢吃、慢慢缓下来', category: 'comfort', time: ['lunch', 'dinner', 'night'], weight: 2 },
-            { name: '米粉', icon: '🍲', reason: '清淡养胃，温柔对待自己', category: 'comfort', time: ['breakfast', 'lunch', 'dinner', 'night'], weight: 2 },
-            { name: '酸辣粉', icon: '🌶️', reason: '酸辣开胃，心情跟着好起来', category: 'comfort', time: ['lunch', 'dinner', 'night'], weight: 2 },
-            { name: '馄饨', icon: '🥟', reason: '一口一个小确幸', category: 'comfort', time: ['breakfast', 'lunch', 'dinner', 'night'], weight: 2 },
-            { name: '水饺', icon: '🥟', reason: '实在又温暖，像被抱住', category: 'comfort', time: ['lunch', 'dinner', 'night'], weight: 2 },
-            { name: '砂锅粥', icon: '🍲', reason: '慢熬的温柔，胃会感谢你', category: 'comfort', time: ['breakfast', 'dinner', 'night'], weight: 2 },
-            { name: '皮蛋瘦肉粥', icon: '🥣', reason: '喝完整个人都暖了', category: 'comfort', time: ['breakfast', 'dinner', 'night'], weight: 2 },
-            { name: '螺蛳粉', icon: '🍜', reason: '想吃点刺激的，让味蕾醒一醒', category: 'comfort', time: ['lunch', 'dinner', 'night'], weight: 2 },
-            { name: '云吞面', icon: '🍜', reason: '面滑汤鲜，港式的温柔', category: 'comfort', time: ['lunch', 'dinner', 'night'], weight: 2 },
-            { name: '热干面', icon: '🍜', reason: '浓郁扎实，武汉人的灵魂', category: 'comfort', time: ['breakfast', 'lunch'], weight: 2 },
-            { name: '担担面', icon: '🍜', reason: '麻辣鲜香，一碗就够', category: 'comfort', time: ['lunch', 'dinner'], weight: 2 },
+            // 🍜 粉面汤类（全天适用，但夜宵和早餐更合适）
+            { name: '拉面', icon: '🍜', reason: '热的会让人舒服一点', category: 'comfort', time: ['lunch', 'dinner', 'night'] },
+            { name: '牛肉面', icon: '🍜', reason: '汤鲜肉足，吃完有力气', category: 'comfort', time: ['lunch', 'dinner'] },
+            { name: '米线', icon: '🥢', reason: '适合慢慢吃、慢慢缓下来', category: 'comfort', time: ['lunch', 'dinner', 'night'] },
+            { name: '米粉', icon: '🍲', reason: '清淡养胃，温柔对待自己', category: 'comfort', time: ['breakfast', 'lunch', 'dinner', 'night'] },
+            { name: '酸辣粉', icon: '🌶️', reason: '酸辣开胃，心情跟着好起来', category: 'comfort', time: ['lunch', 'dinner', 'night'] },
+            { name: '馄饨', icon: '🥟', reason: '一口一个小确幸', category: 'comfort', time: ['breakfast', 'lunch', 'dinner', 'night'] },
+            { name: '水饺', icon: '🥟', reason: '实在又温暖，像被抱住', category: 'comfort', time: ['lunch', 'dinner', 'night'] },
+            { name: '砂锅粥', icon: '🍲', reason: '慢熬的温柔，胃会感谢你', category: 'comfort', time: ['breakfast', 'dinner', 'night'] },
+            { name: '皮蛋瘦肉粥', icon: '🥣', reason: '喝完整个人都暖了', category: 'comfort', time: ['breakfast', 'dinner', 'night'] },
+            { name: '螺蛳粉', icon: '🍜', reason: '想吃点刺激的，让味蕾醒一醒', category: 'comfort', time: ['lunch', 'dinner', 'night'] },
+            { name: '云吞面', icon: '🍜', reason: '面滑汤鲜，港式的温柔', category: 'comfort', time: ['lunch', 'dinner', 'night'] },
+            { name: '热干面', icon: '🍜', reason: '浓郁扎实，武汉人的灵魂', category: 'comfort', time: ['breakfast', 'lunch'] },
+            { name: '担担面', icon: '🍜', reason: '麻辣鲜香，一碗就够', category: 'comfort', time: ['lunch', 'dinner'] },
 
-            // 🍗 快乐碳水类（午餐、晚餐中权重，下午茶高权重）
-            { name: '汉堡', icon: '🍔', reason: '今天可以不用太自律', category: 'happy', time: ['lunch', 'afternoon', 'dinner', 'night'], weight: 2 },
-            { name: '炸鸡', icon: '🍗', reason: '快乐一下也没关系', category: 'happy', time: ['lunch', 'afternoon', 'dinner', 'night'], weight: 2 },
-            { name: '薯条', icon: '🍟', reason: '盐和油脂是快乐密码', category: 'happy', time: ['afternoon', 'night'], weight: 1 },
-            { name: '披萨', icon: '🍕', reason: '芝士就是力量', category: 'happy', time: ['lunch', 'dinner', 'night'], weight: 2 },
-            { name: '炸串', icon: '🍢', reason: '有时候就想吃点"不健康"的', category: 'happy', time: ['afternoon', 'dinner', 'night'], weight: 2 },
-            { name: '章鱼小丸子', icon: '🐙', reason: '一口一个小确幸，治愈系快乐', category: 'happy', time: ['afternoon', 'night'], weight: 1 },
-            { name: '鸡米花', icon: '🍗', reason: '小小的快乐，一颗接一颗', category: 'happy', time: ['afternoon', 'night'], weight: 1 },
+            // 🍗 快乐碳水类（午餐、下午茶、晚餐、夜宵）
+            { name: '汉堡', icon: '🍔', reason: '今天可以不用太自律', category: 'happy', time: ['lunch', 'afternoon', 'dinner', 'night'] },
+            { name: '炸鸡', icon: '🍗', reason: '快乐一下也没关系', category: 'happy', time: ['lunch', 'afternoon', 'dinner', 'night'] },
+            { name: '薯条', icon: '🍟', reason: '盐和油脂是快乐密码', category: 'happy', time: ['afternoon', 'night'] },
+            { name: '披萨', icon: '🍕', reason: '芝士就是力量', category: 'happy', time: ['lunch', 'dinner', 'night'] },
+            { name: '炸串', icon: '🍢', reason: '有时候就想吃点"不健康"的', category: 'happy', time: ['afternoon', 'dinner', 'night'] },
+            { name: '章鱼小丸子', icon: '🐙', reason: '一口一个小确幸，治愈系快乐', category: 'happy', time: ['afternoon', 'night'] },
+            { name: '鸡米花', icon: '🍗', reason: '小小的快乐，一颗接一颗', category: 'happy', time: ['afternoon', 'night'] },
 
             // 🥗 轻食健康类（午餐、晚餐）
-            { name: '沙拉', icon: '🥗', reason: '吃完不会有负担', category: 'light', time: ['lunch', 'dinner'], weight: 2 },
-            { name: '全麦三明治', icon: '🥪', reason: '你已经很努力了', category: 'light', time: ['breakfast', 'lunch', 'afternoon'], weight: 2 },
-            { name: '低脂轻食', icon: '🥙', reason: '对自己好一点，从每一餐开始', category: 'light', time: ['lunch', 'dinner'], weight: 2 },
-            { name: '鸡胸肉套餐', icon: '🍗', reason: '健康也可以很好吃', category: 'light', time: ['lunch', 'dinner'], weight: 2 },
-            { name: '素食便当', icon: '🥗', reason: '清清爽爽，没有压力', category: 'light', time: ['lunch', 'dinner'], weight: 2 },
-            { name: '蔬菜卷', icon: '🌯', reason: '轻盈又满足', category: 'light', time: ['lunch', 'dinner'], weight: 2 },
+            { name: '沙拉', icon: '🥗', reason: '吃完不会有负担', category: 'light', time: ['lunch', 'dinner'] },
+            { name: '全麦三明治', icon: '🥪', reason: '你已经很努力了', category: 'light', time: ['breakfast', 'lunch', 'afternoon'] },
+            { name: '低脂轻食', icon: '🥙', reason: '对自己好一点，从每一餐开始', category: 'light', time: ['lunch', 'dinner'] },
+            { name: '鸡胸肉套餐', icon: '🍗', reason: '健康也可以很好吃', category: 'light', time: ['lunch', 'dinner'] },
+            { name: '素食便当', icon: '🥗', reason: '清清爽爽，没有压力', category: 'light', time: ['lunch', 'dinner'] },
+            { name: '蔬菜卷', icon: '🌯', reason: '轻盈又满足', category: 'light', time: ['lunch', 'dinner'] },
 
-            // 🧋 饮品甜品类（正餐时段低权重，下午茶高权重）
-            { name: '奶茶', icon: '🧋', reason: '不一定饿，只是想被安慰', category: 'sweet', time: ['lunch', 'afternoon', 'dinner', 'night'], weight: 0.5 }, // 正餐时段低权重
-            { name: '咖啡', icon: '☕', reason: '需要一点提神，也需要一点甜', category: 'sweet', time: ['breakfast', 'afternoon'], weight: 1 },
-            { name: '果茶', icon: '🍹', reason: '酸酸甜甜，心情跟着轻快', category: 'sweet', time: ['afternoon'], weight: 1 },
-            { name: '酸奶', icon: '🥛', reason: '温柔的甜，不会腻', category: 'sweet', time: ['breakfast', 'afternoon'], weight: 1 },
-            { name: '甜品', icon: '🍰', reason: '糖分是情绪的止痛药', category: 'sweet', time: ['afternoon'], weight: 1 },
-            { name: '蛋糕', icon: '🎂', reason: '给自己一个甜蜜的理由', category: 'sweet', time: ['afternoon'], weight: 1 },
-            { name: '冰淇淋', icon: '🍦', reason: '凉凉的甜，烦恼会化掉一点', category: 'sweet', time: ['afternoon', 'night'], weight: 1 },
-            { name: '泡芙', icon: '🧁', reason: '一口酥脆一口甜', category: 'sweet', time: ['afternoon'], weight: 1 },
-            { name: '马卡龙', icon: '🍬', reason: '精致的小确幸', category: 'sweet', time: ['afternoon'], weight: 1 },
+            // 🧋 饮品甜品类（下午茶为主）
+            { name: '奶茶', icon: '🧋', reason: '不一定饿，只是想被安慰', category: 'sweet', time: ['afternoon', 'night', 'anytime'] },
+            { name: '咖啡', icon: '☕', reason: '需要一点提神，也需要一点甜', category: 'sweet', time: ['breakfast', 'afternoon', 'anytime'] },
+            { name: '果茶', icon: '🍹', reason: '酸酸甜甜，心情跟着轻快', category: 'sweet', time: ['afternoon', 'anytime'] },
+            { name: '酸奶', icon: '🥛', reason: '温柔的甜，不会腻', category: 'sweet', time: ['breakfast', 'afternoon', 'anytime'] },
+            { name: '甜品', icon: '🍰', reason: '糖分是情绪的止痛药', category: 'sweet', time: ['afternoon'] },
+            { name: '蛋糕', icon: '🎂', reason: '给自己一个甜蜜的理由', category: 'sweet', time: ['afternoon'] },
+            { name: '冰淇淋', icon: '🍦', reason: '凉凉的甜，烦恼会化掉一点', category: 'sweet', time: ['afternoon', 'night'] },
+            { name: '泡芙', icon: '🧁', reason: '一口酥脆一口甜', category: 'sweet', time: ['afternoon'] },
+            { name: '马卡龙', icon: '🍬', reason: '精致的小确幸', category: 'sweet', time: ['afternoon'] },
 
-            // 🍉 补充能量类（全时段低权重）
-            { name: '水果拼盘', icon: '🍉', reason: '不想吃饭也没关系', category: 'light', time: ['afternoon'], weight: 1 },
-            { name: '坚果', icon: '🥜', reason: '先照顾好自己', category: 'light', time: ['afternoon'], weight: 1 },
-            { name: '面包', icon: '🥖', reason: '简单一点，也挺好', category: 'light', time: ['breakfast', 'afternoon', 'night'], weight: 1 },
-            { name: '小零食拼盘', icon: '🍪', reason: '随便吃点，别饿着就行', category: 'light', time: ['afternoon', 'night'], weight: 1 },
+            // 🍉 补充能量类（全时段可选）
+            { name: '水果拼盘', icon: '🍉', reason: '不想吃饭也没关系', category: 'light', time: ['anytime'] },
+            { name: '坚果', icon: '🥜', reason: '先照顾好自己', category: 'light', time: ['anytime'] },
+            { name: '面包', icon: '🥖', reason: '简单一点，也挺好', category: 'light', time: ['breakfast', 'afternoon', 'night'] },
+            { name: '小零食拼盘', icon: '🍪', reason: '随便吃点，别饿着就行', category: 'light', time: ['afternoon', 'night'] },
 
             // 🌙 夜宵专属
-            { name: '烧烤', icon: '串', reason: '夜晚的仪式感', category: 'happy', time: ['night'], weight: 1 },
-            { name: '麻辣烫', icon: '🍲', reason: '深夜食堂，想吃就吃', category: 'comfort', time: ['night', 'dinner'], weight: 1 },
-            { name: '炒粉', icon: '🍜', reason: '夜宵就该这么吃', category: 'comfort', time: ['night'], weight: 1 },
-            { name: '小龙虾', icon: '🦞', reason: '今晚放纵一下', category: 'happy', time: ['night', 'dinner'], weight: 1 },
-            { name: '关东煮', icon: '🍢', reason: '暖暖的，陪你到深夜', category: 'comfort', time: ['night'], weight: 1 },
-            { name: '煎饺', icon: '🥟', reason: '脆脆的底，满满的馅', category: 'comfort', time: ['night', 'breakfast'], weight: 1 }
+            { name: '烧烤', icon: '串', reason: '夜晚的仪式感', category: 'happy', time: ['night'] },
+            { name: '麻辣烫', icon: '🍲', reason: '深夜食堂，想吃就吃', category: 'comfort', time: ['night', 'dinner'] },
+            { name: '炒粉', icon: '🍜', reason: '夜宵就该这么吃', category: 'comfort', time: ['night'] },
+            { name: '小龙虾', icon: '🦞', reason: '今晚放纵一下', category: 'happy', time: ['night', 'dinner'] },
+            { name: '关东煮', icon: '🍢', reason: '暖暖的，陪你到深夜', category: 'comfort', time: ['night'] },
+            { name: '煎饺', icon: '🥟', reason: '脆脆的底，满满的馅', category: 'comfort', time: ['night', 'breakfast'] }
         ];
 
         // 【可修改】彩蛋概率设置
@@ -474,46 +477,12 @@
             return 'night';                                    // 21:00-次日5:59
         }
 
-        // 【方案B核心】根据时段和权重过滤食物选项
+        // 根据时段过滤食物选项
         function getAvailableFoods() {
             const currentPeriod = getCurrentTimePeriod();
-            const availableFoods = foodOptions.filter(food => 
-                food.time.includes(currentPeriod)
+            return foodOptions.filter(food => 
+                food.time.includes(currentPeriod) || food.time.includes('anytime')
             );
-
-            // 根据权重调整概率（在正餐时段降低饮品概率）
-            if (currentPeriod === 'lunch' || currentPeriod === 'dinner') {
-                // 正餐时段：优先推荐正餐类
-                const weightedFoods = [];
-                availableFoods.forEach(food => {
-                    const repeat = Math.ceil(food.weight * 10); // 权重转换为重复次数
-                    for (let i = 0; i < repeat; i++) {
-                        weightedFoods.push(food);
-                    }
-                });
-                return weightedFoods;
-            } else if (currentPeriod === 'afternoon') {
-                // 下午茶时段：提高饮品甜品权重
-                const weightedFoods = [];
-                availableFoods.forEach(food => {
-                    const baseWeight = food.category === 'sweet' ? 3 : 1; // 饮品类3倍权重
-                    const repeat = Math.ceil(baseWeight * 10);
-                    for (let i = 0; i < repeat; i++) {
-                        weightedFoods.push(food);
-                    }
-                });
-                return weightedFoods;
-            } else {
-                // 其他时段：正常权重
-                const weightedFoods = [];
-                availableFoods.forEach(food => {
-                    const repeat = Math.ceil(food.weight * 10);
-                    for (let i = 0; i < repeat; i++) {
-                        weightedFoods.push(food);
-                    }
-                });
-                return weightedFoods;
-            }
         }
 
         // 初始化
@@ -620,7 +589,7 @@
                 return;
             }
 
-            // 正常抽取 - 根据时段和权重过滤
+            // 正常抽取 - 根据时段过滤
             const availableFoods = getAvailableFoods();
             if (availableFoods.length === 0) {
                 showSpecialMessage('😅', '当前时段暂无合适的选项\n要不要换个时间再试试', '好的');
